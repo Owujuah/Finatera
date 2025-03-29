@@ -100,7 +100,7 @@ const SignUp = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
           <div className="w-10 h-10 rounded-full bg-banking-primary flex items-center justify-center">
-            <span className="text-white font-bold"><img src="public/Images/image 2.png" alt="" /></span>
+            <span className="text-white font-bold"><img src="/Images/image 1.jpeg" alt="" /></span>
           </div>
           <span className="font-bold text-2xl">Unity Grande</span>
         </Link>
