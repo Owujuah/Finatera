@@ -11,7 +11,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-banking-primary flex items-center justify-center">
-                <span className="text-white font-bold"><img src="Images/image 2.png" alt="" /></span>
+                <span className="text-white font-bold"><img src="public/Images/image 2.png" alt="" /></span>
               </div>
               <span className="font-bold text-xl">Unity Grande</span>
             </div>
