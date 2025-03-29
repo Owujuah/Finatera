@@ -11,15 +11,15 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-banking-primary flex items-center justify-center">
-                <span className="text-white font-bold">F</span>
+                <span className="text-white font-bold"><img src="Images/image 2.png" alt="" /></span>
               </div>
-              <span className="font-bold text-xl">Finatera bank</span>
+              <span className="font-bold text-xl">Unity Grande</span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Fast. Secure. Trusted banking for the modern world.
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              © {currentYear} Finatera. All rights reserved.
+              © {currentYear} Unity Grande. All rights reserved.
             </p>
           </div>
           

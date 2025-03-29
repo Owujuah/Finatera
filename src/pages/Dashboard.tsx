@@ -45,7 +45,7 @@ const Dashboard = () => {
       
       <main className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Finatera Dashboard</h1>
+          <h1 className="text-3xl font-bold">Unity Grande Dashboard</h1>
           <p className="text-lg mt-2 md:mt-0 text-gray-600 dark:text-gray-400">
             Welcome, <span className="font-semibold">{userName}</span>
           </p>

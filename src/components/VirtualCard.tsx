@@ -49,7 +49,7 @@ const VirtualCard = ({ simplifiedView = false,  }) => {
           <div className="flex flex-col h-full justify-between">
             <div className="flex justify-between items-start">
               <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <span className="font-bold text-white text-lg">F</span>
+                <span className="font-bold text-white text-lg">U</span>
               </div>
             </div>
             
@@ -77,7 +77,7 @@ const VirtualCard = ({ simplifiedView = false,  }) => {
           <div className="flex flex-col h-full justify-between">
             <div className="flex justify-between items-start">
               <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <span className="font-bold text-white text-lg">F</span>
+                <span className="font-bold text-white text-lg">U</span>
               </div>
               <div className="text-right">
                 <p className="text-lg font-semibold">{formatCurrency(balance)}</p>
@@ -126,7 +126,7 @@ const VirtualCard = ({ simplifiedView = false,  }) => {
             
             <div className="space-y-2">
               <div className="text-center">
-                <p className="text-sm">Finatera Banking</p>
+                <p className="text-sm">Unity Grande Banking</p>
                 <p className="text-xs opacity-80">International Banking Services</p>
               </div>
               <div className="flex justify-center mt-4">

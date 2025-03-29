@@ -24,7 +24,7 @@ const Cards = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Your Card</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            View and manage your Finatera card
+            View your Unity Grande card
           </p>
         </div>
         

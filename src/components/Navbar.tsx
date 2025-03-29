@@ -63,9 +63,9 @@ const Navbar = () => {
       <div className="container flex items-center justify-between py-4">
         <Link to="/" className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center">
-            <span className="text-white font-bold">F</span>
+            <span className="text-white font-bold"><img src="Images/image 2.png" alt="" /></span>
           </div>
-          <span className="font-bold text-xl">Finatera</span>
+          <span className="font-bold text-xl">Unity Grande</span>
         </Link>
         
         {!isMobile && (
