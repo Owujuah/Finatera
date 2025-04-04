@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
-import { getCurrentUserId, getUserById } from '../utils/authUtils';
+import { getCurrentUserId, getUserById, INITIAL_BALANCE } from '../utils/authUtils';
 import { updateUser, addTransaction, formatCurrency } from '../utils/storageUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +23,7 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
       if (userId) {
         const user = await getUserById(userId);
         if (user) {
-          setBalance(user.balance);
+          setBalance(INITIAL_BALANCE);
         }
       }
     };
@@ -179,6 +179,7 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
           className="w-full"
         />
       </div>
+      
 
       <div className="space-y-2">
         <Label htmlFor="amount">Amount</Label>
@@ -201,7 +202,7 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
           )}
         </div>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Available Balance: {formatCurrency(balance)}
+          Available Balance: {formatCurrency(INITIAL_BALANCE)}
         </p>
       </div>
 

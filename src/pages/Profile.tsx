@@ -24,7 +24,7 @@ const Profile = () => {
       // Check if the user is authenticated
       const auth = await isAuthenticated();
       if (!auth) {
-        navigate('/login');
+        navigate('/Profile');
         return;
       }
       

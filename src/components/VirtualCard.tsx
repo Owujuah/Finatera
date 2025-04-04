@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCurrentUserId, getUserById } from '../utils/authUtils';
+import { getCurrentUserId, getUserById, INITIAL_BALANCE } from '../utils/authUtils';
 import { formatCurrency } from '../utils/storageUtils';
 
 interface VirtualCardProps {
@@ -9,7 +9,7 @@ interface VirtualCardProps {
 // Helper function to format card number (remains local)
 const formatCardNumber = (cardNumber: string): string => {
   const last4 = cardNumber.slice(-4);
-  return `**** **** **** ${last4}`;
+  return `**** **** 3345 ${last4}`;
 };
 
 const VirtualCard = ({ simplifiedView = false }: VirtualCardProps) => {
@@ -60,7 +60,7 @@ const VirtualCard = ({ simplifiedView = false }: VirtualCardProps) => {
             <div className="flex justify-center items-center h-full">
               <div className="text-center">
                 <p className="text-sm text-white/80 mb-1">Available Balance</p>
-                <p className="text-2xl font-bold">{formatCurrency(balance)}</p>
+                <p className="text-2xl font-bold">{formatCurrency(INITIAL_BALANCE)}</p>
               </div>
             </div>
           </div>
@@ -83,7 +83,7 @@ const VirtualCard = ({ simplifiedView = false }: VirtualCardProps) => {
                 <span className="font-bold text-white text-lg">U</span>
               </div>
               <div className="text-right">
-                <p className="text-lg font-semibold">{formatCurrency(balance)}</p>
+                <p className="text-lg font-semibold">{formatCurrency(INITIAL_BALANCE)}</p>
               </div>
             </div>
             <div className="space-y-6">
