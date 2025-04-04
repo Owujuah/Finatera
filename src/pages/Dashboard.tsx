@@ -17,21 +17,25 @@ const Dashboard = () => {
   
   // Check if user is authenticated
   useEffect(() => {
-    if (!isAuthenticated()) {
-      navigate('/login');
-    } else {
-      // Get user name for welcome message
-      const userId = getCurrentUserId();
+    const loadUser = async () => {
+      const authenticated = await isAuthenticated();
+      if (!authenticated) {
+        navigate('/login');
+        return;
+      }
+  
+      const userId = await getCurrentUserId();
       if (userId) {
-        const user = getUserById(userId);
+        const user = await getUserById(userId);
         if (user) {
           setUserName(user.name);
-          // We're not setting the balance from the user data anymore
-          // as we want to keep it at $765,620.00
         }
       }
-    }
+    };
+  
+    loadUser();
   }, [navigate]);
+  
   
   // Handle transfer completion
   const handleTransferComplete = () => {

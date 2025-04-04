@@ -1,16 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
-import { 
-  getCurrentUserId, 
-  getUserById 
-} from '../utils/authUtils';
-import { 
-  updateUser, 
-  addTransaction,
-  formatCurrency 
-} from '../utils/storageUtils';
+import { getCurrentUserId, getUserById } from '../utils/authUtils';
+import { updateUser, addTransaction, formatCurrency } from '../utils/storageUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,32 +15,29 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
   const [isLoading, setIsLoading] = useState(false);
   const [balance, setBalance] = useState(0);
   const { toast } = useToast();
-  
+
+  // Load user balance when the component mounts
   useEffect(() => {
-    // Get user balance
-    const userId = getCurrentUserId();
-    if (userId) {
-      const user = getUserById(userId);
-      if (user) {
-        setBalance(user.balance);
+    const loadUserBalance = async () => {
+      const userId = await getCurrentUserId();
+      if (userId) {
+        const user = await getUserById(userId);
+        if (user) {
+          setBalance(user.balance);
+        }
       }
-    }
+    };
+    loadUserBalance();
   }, []);
-  
-  // Handle amount change with formatting
+
+  // Handle amount change and display formatted currency
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Remove non-numeric characters
     const value = e.target.value.replace(/[^0-9.]/g, '');
-    
-    // Allow only one decimal point
     const parts = value.split('.');
-    const formattedValue = parts.length > 2 
-      ? `${parts[0]}.${parts.slice(1).join('')}` 
-      : value;
-    
+    const formattedValue =
+      parts.length > 2 ? `${parts[0]}.${parts.slice(1).join('')}` : value;
     setAmount(formattedValue);
-    
-    // Format for display
+
     const numValue = parseFloat(formattedValue);
     if (!isNaN(numValue)) {
       setFormattedAmount(formatCurrency(numValue));
@@ -56,12 +45,13 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
       setFormattedAmount('');
     }
   };
-  
-  // Handle transfer
-  const handleTransfer = (e: React.FormEvent) => {
+
+  // Handle the transfer process
+  const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const userId = getCurrentUserId();
+
+    // Retrieve current user id and user data asynchronously
+    const userId = await getCurrentUserId();
     if (!userId) {
       toast({
         title: "Authentication Error",
@@ -70,9 +60,8 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
       });
       return;
     }
-    
-    // Get user
-    const user = getUserById(userId);
+
+    const user = await getUserById(userId);
     if (!user) {
       toast({
         title: "User Error",
@@ -81,8 +70,8 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
       });
       return;
     }
-    
-    // Validate inputs
+
+    // Validate form inputs
     if (!receiverName || !receiverAccount || !amount) {
       toast({
         title: "Validation Error",
@@ -91,10 +80,8 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
       });
       return;
     }
-    
+
     const parsedAmount = parseFloat(amount);
-    
-    // Validate amount
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       toast({
         title: "Amount Error",
@@ -103,8 +90,8 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
       });
       return;
     }
-    
-    // Check if user has enough balance
+
+    // Check for sufficient funds
     if (parsedAmount > user.balance) {
       toast({
         title: "Insufficient Funds",
@@ -113,21 +100,20 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
       });
       return;
     }
-    
+
     setIsLoading(true);
-    
-    // Simulate server processing
-    setTimeout(() => {
+
+    // Simulate server processing delay
+    setTimeout(async () => {
       try {
-        // Update user balance
+        // Update user's balance
         const updatedUser = {
           ...user,
           balance: user.balance - parsedAmount
         };
-        
-        updateUser(updatedUser);
-        
-        // Add transaction
+        await updateUser(updatedUser);
+
+        // Create a transaction record
         const transaction = {
           id: uuidv4(),
           senderId: userId,
@@ -137,24 +123,23 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
           date: new Date().toISOString(),
           type: 'transfer' as const
         };
-        
-        addTransaction(transaction);
-        
-        // Reset form
+        await addTransaction(transaction);
+
+        // Reset the form
         setReceiverName('');
         setReceiverAccount('');
         setAmount('');
         setFormattedAmount('');
         setBalance(updatedUser.balance);
-        
-        // Show success message
+
+        // Show success toast
         toast({
           title: "Transfer Successful",
           description: `You have transferred ${formatCurrency(parsedAmount)} to ${receiverName}.`,
           variant: "default"
         });
-        
-        // Update parent component
+
+        // Notify parent component to update data
         onTransferComplete();
       } catch (error) {
         console.error('Transfer error:', error);
@@ -168,7 +153,7 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
       }
     }, 1500);
   };
-  
+
   return (
     <form onSubmit={handleTransfer} className="space-y-6">
       <div className="space-y-2">
@@ -182,7 +167,7 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
           className="w-full"
         />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="receiverAccount">Account Number</Label>
         <Input
@@ -194,7 +179,7 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
           className="w-full"
         />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="amount">Amount</Label>
         <div className="relative">
@@ -219,7 +204,7 @@ const TransferForm = ({ onTransferComplete }: { onTransferComplete: () => void }
           Available Balance: {formatCurrency(balance)}
         </p>
       </div>
-      
+
       <Button 
         type="submit" 
         className="w-full"

@@ -1,6 +1,9 @@
-// authUtils.ts
+
+
+import { Transaction } from './storageUtils';
 import { supabase } from './supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
+
 
 export const INITIAL_BALANCE = 765620;
 
@@ -24,6 +27,29 @@ export const isAuthenticated = async (): Promise<boolean> => {
     return false;
   }
   return data.session !== null;
+};
+
+export const getCurrentUserId = async (): Promise<string | null> => {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    console.error('Error fetching session:', error);
+    return null;
+  }
+  return data.session?.user.id || null;
+};
+
+// Fetch a user's data by ID from the Supabase "users" table
+export const getUserById = async (userId: string): Promise<AppUser | null> => {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  if (error || !data) {
+    console.error('Error fetching user by ID:', error);
+    return null;
+  }
+  return data;
 };
 
 // Helper function to generate a random card number
@@ -85,14 +111,16 @@ export const registerUser = async (
       .select() // Request returning data
       .single();
 
-    if (error) {
-      return { success: false, error: error.message };
-    }
-    
+      if (error) {
+        console.error('Supabase Insert Error:', JSON.stringify(error, null, 2));
+        return { success: false, error: error.message || 'Unknown error' };
+      }
+      
     // Cast the returned data to AppUser
     const insertedUser = data as AppUser;
     return { success: true, userId: insertedUser.id };
   } catch (error: any) {
+    console.error('Registration Catch Error:', error);
     return { success: false, error: error.message || 'Registration failed' };
   }
 };
@@ -121,4 +149,33 @@ export const loginUser = async (
   } catch (error: any) {
     return { success: false, error: error.message || 'Login failed' };
   }
+};
+
+// Logout the current user using Supabase
+export const logoutUser = async (): Promise<void> => {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error('Error during logout:', error);
+  }
+};
+
+
+export const getUserTransactions = async (userId: string): Promise<Transaction[]> => {
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*')
+    .eq('senderId', userId);
+  if (error) {
+    console.error('Error fetching transactions:', error);
+    return [];
+  }
+  return data || [];
+};
+
+export const initAuth = async (): Promise<void> => {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    console.error('Error initializing auth:', error);
+  }
+  // You can perform additional initialization here if needed.
 };

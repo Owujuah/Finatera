@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { 
@@ -35,44 +34,48 @@ const TransactionHistory = ({ refreshTrigger, filter = 'all' }: TransactionHisto
   const [searchTerm, setSearchTerm] = useState('');
   
   useEffect(() => {
-    const userId = getCurrentUserId();
-    if (userId) {
-      const userTransactions = getUserTransactions(userId);
-      
-      // Modify transactions to include status - first one is success, others alternate
-      const modifiedTransactions = userTransactions.map((transaction, index) => {
-        let status: 'success' | 'pending' | 'failed';
-        if (index === 0) {
-          status = 'success';
-        } else if (index % 2 === 0) {
-          status = 'failed';
-        } else {
-          status = 'pending';
-        }
+    const loadTransactions = async () => {
+      const userId = await getCurrentUserId();
+      if (userId) {
+        const userTransactions = await getUserTransactions(userId);
         
-        return {
-          ...transaction,
-          status
-        };
-      });
-      
-      // Sort by date in descending order (newest first)
-      const sortedTransactions = modifiedTransactions.sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-      
-      setTransactions(sortedTransactions);
-      
-      // Apply status filter if specified
-      if (filter !== 'all') {
-        const statusFiltered = sortedTransactions.filter(
-          transaction => transaction.status === filter
+        // Modify transactions to include status - first one is success, others alternate
+        const modifiedTransactions = userTransactions.map((transaction, index) => {
+          let status: 'success' | 'pending' | 'failed';
+          if (index === 0) {
+            status = 'success';
+          } else if (index % 2 === 0) {
+            status = 'failed';
+          } else {
+            status = 'pending';
+          }
+          
+          return {
+            ...transaction,
+            status
+          };
+        });
+        
+        // Sort by date in descending order (newest first)
+        const sortedTransactions = modifiedTransactions.sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
         );
-        setFilteredTransactions(statusFiltered);
-      } else {
-        setFilteredTransactions(sortedTransactions);
+        
+        setTransactions(sortedTransactions);
+        
+        // Apply status filter if specified
+        if (filter !== 'all') {
+          const statusFiltered = sortedTransactions.filter(
+            transaction => transaction.status === filter
+          );
+          setFilteredTransactions(statusFiltered);
+        } else {
+          setFilteredTransactions(sortedTransactions);
+        }
       }
-    }
+    };
+
+    loadTransactions();
   }, [refreshTrigger, filter]);
   
   // Filter transactions when search term changes
