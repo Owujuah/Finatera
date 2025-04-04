@@ -40,10 +40,10 @@ const Login = () => {
     setIsLoading(true);
     
     // Simulate server processing
-    setTimeout(() => {
+    setTimeout(async () => {
       const result = loginUser(email, password);
       
-      if (result.success) {
+      if ((await result).success) {
         toast({
           title: "Login Successful",
           description: "You have been logged in successfully.",
@@ -55,7 +55,7 @@ const Login = () => {
       } else {
         toast({
           title: "Login Failed",
-          description: result.error || "Invalid email or password.",
+          description: (await result).error || "Invalid email or password.",
           variant: "destructive"
         });
       }

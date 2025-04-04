@@ -1,12 +1,23 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { registerUser } from '../utils/authUtils';
+import { registerUser, generateCardNumber, generateExpiryDate, generateCVV } from '../utils/authUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  createdAt: string;
+  cardNumber: string;
+  expiryDate: string;
+  cvv: string;
+  balance: number;
+}
 
 const SignUp = () => {
   const [name, setName] = useState('');
@@ -23,11 +34,11 @@ const SignUp = () => {
     setShowPassword(!showPassword);
   };
   
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle form submission (async version)
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
+    // Validate form fields
     if (!name || !email || !password || !confirmPassword) {
       toast({
         title: "Validation Error",
@@ -70,9 +81,26 @@ const SignUp = () => {
     
     setIsLoading(true);
     
-    // Simulate server processing
-    setTimeout(() => {
-      const result = registerUser(name, email, password);
+    try {
+      // If you want to build the newUser object in your component:
+      /*
+      const newUser: User = {
+        id: /* generate or use Supabase generated id * / 'some-unique-id',
+        name,
+        email,
+        password, // Remember: in a real app, hash the password!
+        createdAt: new Date().toISOString(),
+        cardNumber: generateCardNumber(),
+        expiryDate: generateExpiryDate(),
+        cvv: generateCVV(),
+        balance: 0 // initial balance
+      };
+      
+      const result = await addUser(newUser);
+      */
+      
+      // Or if your registerUser function handles creating the user (including generating card details), simply call it:
+      const result = await registerUser(name, email, password);
       
       if (result.success) {
         toast({
@@ -80,8 +108,6 @@ const SignUp = () => {
           description: "Your account has been created successfully.",
           variant: "default"
         });
-        
-        // Redirect to dashboard
         navigate('/dashboard');
       } else {
         toast({
@@ -90,9 +116,15 @@ const SignUp = () => {
           variant: "destructive"
         });
       }
-      
-      setIsLoading(false);
-    }, 1500);
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description: error.message || "An error occurred during registration.",
+        variant: "destructive"
+      });
+    }
+    
+    setIsLoading(false);
   };
   
   return (
@@ -100,7 +132,9 @@ const SignUp = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
           <div className="w-10 h-10 rounded-full bg-banking-primary flex items-center justify-center">
-            <span className="text-white font-bold"><img src="/Images/image 2.png" alt="owujuah"/></span>
+            <span className="text-white font-bold">
+              <img src="/Images/image 2.png" alt="owujuah" />
+            </span>
           </div>
           <span className="font-bold text-2xl">Unity Grande</span>
         </Link>

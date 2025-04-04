@@ -1,3 +1,4 @@
+import { supabase } from './supabaseClient';
 
 export interface User {
   id: string;
@@ -21,56 +22,67 @@ export interface Transaction {
   type: 'transfer' | 'deposit' | 'withdrawal';
 }
 
-// Get all users
-export const getUsers = (): User[] => {
-  const users = localStorage.getItem('banking_users');
-  return users ? JSON.parse(users) : [];
-};
+// ---------------------- Users ----------------------
 
-// Save users
-export const saveUsers = (users: User[]): void => {
-  localStorage.setItem('banking_users', JSON.stringify(users));
+// Get all users
+export const getUsers = async (): Promise<User[]> => {
+  const { data, error } = await supabase.from('users').select('*');
+  if (error) throw error;
+  return data as User[];
 };
 
 // Get user by ID
-export const getUserById = (id: string): User | null => {
-  const users = getUsers();
-  return users.find(user => user.id === id) || null;
+export const getUserById = async (id: string): Promise<User | null> => {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error) return null; // or handle error appropriately
+  return data as User;
 };
 
 // Add a new user
-export const addUser = (user: User): void => {
-  const users = getUsers();
-  saveUsers([...users, user]);
+export const addUser = async (user: User): Promise<void> => {
+  const { error } = await supabase.from('users').insert([user]);
+  if (error) throw error;
 };
 
 // Update a user
-export const updateUser = (updatedUser: User): void => {
-  const users = getUsers();
-  const updatedUsers = users.map(user => 
-    user.id === updatedUser.id ? updatedUser : user
-  );
-  saveUsers(updatedUsers);
+export const updateUser = async (updatedUser: User): Promise<void> => {
+  const { error } = await supabase
+    .from('users')
+    .update(updatedUser)
+    .match({ id: updatedUser.id });
+  if (error) throw error;
 };
 
+// ------------------- Transactions -------------------
+
 // Get all transactions
-export const getTransactions = (): Transaction[] => {
-  const transactions = localStorage.getItem('banking_transactions');
-  return transactions ? JSON.parse(transactions) : [];
+export const getTransactions = async (): Promise<Transaction[]> => {
+  const { data, error } = await supabase.from('transactions').select('*');
+  if (error) throw error;
+  return data as Transaction[];
 };
 
 // Get transactions for a specific user
-export const getUserTransactions = (userId: string): Transaction[] => {
-  const transactions = getTransactions();
-  return transactions.filter(transaction => transaction.senderId === userId);
+export const getUserTransactions = async (userId: string): Promise<Transaction[]> => {
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*')
+    .eq('senderId', userId);
+  if (error) throw error;
+  return data as Transaction[];
 };
 
 // Add a new transaction
-export const addTransaction = (transaction: Transaction): void => {
-  const transactions = getTransactions();
-  const updatedTransactions = [...transactions, transaction];
-  localStorage.setItem('banking_transactions', JSON.stringify(updatedTransactions));
+export const addTransaction = async (transaction: Transaction): Promise<void> => {
+  const { error } = await supabase.from('transactions').insert([transaction]);
+  if (error) throw error;
 };
+
+// ---------------------- Helpers ----------------------
 
 // Generate a random card number
 export const generateCardNumber = (): string => {
