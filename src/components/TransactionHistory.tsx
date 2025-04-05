@@ -1,15 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
-import { 
-  getCurrentUserId, 
-  getUserTransactions 
-} from '../utils/authUtils';
-import { 
-  formatCurrency, 
-  formatDate 
-} from '../utils/storageUtils';
+import { getCurrentUserId, getUserTransactions } from '../utils/authUtils';
+import { formatCurrency, formatDate } from '../utils/storageUtils';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 
 interface Transaction {
@@ -32,14 +25,15 @@ const TransactionHistory = ({ refreshTrigger, filter = 'all' }: TransactionHisto
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
+  // Fetch transactions from Supabase
   useEffect(() => {
     const loadTransactions = async () => {
       const userId = await getCurrentUserId();
       if (userId) {
         const userTransactions = await getUserTransactions(userId);
-        
-        // Modify transactions to include status - first one is success, others alternate
+
+        // Add status to transactions
         const modifiedTransactions = userTransactions.map((transaction, index) => {
           let status: 'success' | 'pending' | 'failed';
           if (index === 0) {
@@ -49,24 +43,24 @@ const TransactionHistory = ({ refreshTrigger, filter = 'all' }: TransactionHisto
           } else {
             status = 'pending';
           }
-          
+
           return {
             ...transaction,
-            status
+            status,
           };
         });
-        
-        // Sort by date in descending order (newest first)
-        const sortedTransactions = modifiedTransactions.sort((a, b) => 
-          new Date(b.date).getTime() - new Date(a.date).getTime()
+
+        // Sort transactions by date (newest first)
+        const sortedTransactions = modifiedTransactions.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
         );
-        
+
         setTransactions(sortedTransactions);
-        
-        // Apply status filter if specified
+
+        // Apply filter
         if (filter !== 'all') {
           const statusFiltered = sortedTransactions.filter(
-            transaction => transaction.status === filter
+            (transaction) => transaction.status === filter
           );
           setFilteredTransactions(statusFiltered);
         } else {
@@ -77,34 +71,35 @@ const TransactionHistory = ({ refreshTrigger, filter = 'all' }: TransactionHisto
 
     loadTransactions();
   }, [refreshTrigger, filter]);
-  
-  // Filter transactions when search term changes
+
+  // Filter transactions based on search term
   useEffect(() => {
     let filtered = transactions;
-    
-    // First apply status filter if needed
+
+    // Apply status filter
     if (filter !== 'all') {
-      filtered = filtered.filter(transaction => transaction.status === filter);
+      filtered = filtered.filter((transaction) => transaction.status === filter);
     }
-    
-    // Then apply search term filter
+
+    // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(transaction => 
-        transaction.receiverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.receiverAccount.includes(searchTerm) ||
-        transaction.amount.toString().includes(searchTerm) ||
-        formatDate(transaction.date).toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (transaction) =>
+          transaction.receiverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          transaction.receiverAccount.includes(searchTerm) ||
+          transaction.amount.toString().includes(searchTerm) ||
+          formatDate(transaction.date).toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     setFilteredTransactions(filtered);
   }, [searchTerm, transactions, filter]);
-  
+
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
-  
+
   // Get status badge color
   const getStatusColor = (status?: 'success' | 'pending' | 'failed') => {
     switch (status) {
@@ -118,9 +113,10 @@ const TransactionHistory = ({ refreshTrigger, filter = 'all' }: TransactionHisto
         return 'bg-gray-500';
     }
   };
-  
+
   return (
     <div className="space-y-4">
+      {/* Search Input */}
       <div className="relative">
         <Input
           placeholder="Search transactions..."
@@ -130,7 +126,8 @@ const TransactionHistory = ({ refreshTrigger, filter = 'all' }: TransactionHisto
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
       </div>
-      
+
+      {/* Transactions List */}
       {filteredTransactions.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-gray-500 dark:text-gray-400">No transactions found</p>
@@ -151,12 +148,19 @@ const TransactionHistory = ({ refreshTrigger, filter = 'all' }: TransactionHisto
                 </div>
                 <div className="text-right">
                   <div className="flex items-center justify-end space-x-2">
-                    <p className="font-semibold text-red-500">-{formatCurrency(transaction.amount)}</p>
-                    <Badge variant="outline" className={`${getStatusColor(transaction.status)} text-white`}>
+                    <p className="font-semibold text-red-500">
+                      -{formatCurrency(transaction.amount)}
+                    </p>
+                    <Badge
+                      variant="outline"
+                      className={`${getStatusColor(transaction.status)} text-white`}
+                    >
                       {transaction.status}
                     </Badge>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{formatDate(transaction.date)}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {formatDate(transaction.date)}
+                  </p>
                 </div>
               </div>
             </div>

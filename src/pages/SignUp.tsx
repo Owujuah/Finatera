@@ -7,18 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  createdAt: string;
-  cardNumber: string;
-  expiryDate: string;
-  cvv: string;
-  balance: number;
-}
-
 const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -28,105 +16,94 @@ const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+
   // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  
-  // Handle form submission (async version)
+
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form fields
     if (!name || !email || !password || !confirmPassword) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all fields.",
-        variant: "destructive"
+        title: 'Validation Error',
+        description: 'Please fill in all fields.',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast({
-        title: "Validation Error",
-        description: "Please enter a valid email address.",
-        variant: "destructive"
+        title: 'Validation Error',
+        description: 'Please enter a valid email address.',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     // Validate password length
     if (password.length < 6) {
       toast({
-        title: "Validation Error",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive"
+        title: 'Validation Error',
+        description: 'Password must be at least 6 characters long.',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     // Validate password match
     if (password !== confirmPassword) {
       toast({
-        title: "Validation Error",
+        title: 'Validation Error',
         description: "Passwords don't match.",
-        variant: "destructive"
+        variant: 'destructive',
       });
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
-      // If you want to build the newUser object in your component:
-      /*
-      const newUser: User = {
-        id: /* generate or use Supabase generated id * / 'some-unique-id',
-        name,
-        email,
-        password, // Remember: in a real app, hash the password!
-        createdAt: new Date().toISOString(),
-        cardNumber: generateCardNumber(),
-        expiryDate: generateExpiryDate(),
-        cvv: generateCVV(),
-        balance: 0 // initial balance
-      };
-      
-      const result = await addUser(newUser);
-      */
-      
-      // Or if your registerUser function handles creating the user (including generating card details), simply call it:
+      // Generate additional user details
+      const cardNumber = generateCardNumber();
+      const expiryDate = generateExpiryDate();
+      const cvv = generateCVV();
+      const balance = 0; // Initial balance
+
+      // Register the user
       const result = await registerUser(name, email, password);
-      
+
       if (result.success) {
         toast({
-          title: "Registration Successful",
-          description: "Your account has been created successfully.",
-          variant: "default"
+          title: 'Registration Successful',
+          description: 'Your account has been created successfully.',
+          variant: 'default',
         });
         navigate('/dashboard');
       } else {
         toast({
-          title: "Registration Failed",
-          description: result.error || "An error occurred during registration.",
-          variant: "destructive"
+          title: 'Registration Failed',
+          description: result.error || 'An error occurred during registration.',
+          variant: 'destructive',
         });
       }
     } catch (error: any) {
       toast({
-        title: "Registration Failed",
-        description: error.message || "An error occurred during registration.",
-        variant: "destructive"
+        title: 'Registration Failed',
+        description: error.message || 'An error occurred during registration.',
+        variant: 'destructive',
       });
     }
-    
+
     setIsLoading(false);
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -236,55 +213,12 @@ const SignUp = () => {
             </div>
 
             <div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Creating Account...' : 'Sign Up'}
               </Button>
             </div>
           </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                  By creating an account, you agree to our
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6 text-center text-sm">
-              <Link
-                to="#"
-                className="font-medium text-banking-primary hover:text-banking-primary/80 transition-colors"
-              >
-                Terms of Service
-              </Link>
-              {' and '}
-              <Link
-                to="#"
-                className="font-medium text-banking-primary hover:text-banking-primary/80 transition-colors"
-              >
-                Privacy Policy
-              </Link>
-            </div>
-          </div>
         </div>
-      </div>
-      
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <Link
-          to="/"
-          className="flex items-center justify-center space-x-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to home</span>
-        </Link>
       </div>
     </div>
   );

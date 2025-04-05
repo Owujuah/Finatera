@@ -22,16 +22,16 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  // Handle form submission using async/await properly
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate fields
     if (!email || !password) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all fields.",
-        variant: "destructive"
+        title: 'Validation Error',
+        description: 'Please fill in all fields.',
+        variant: 'destructive',
       });
       return;
     }
@@ -39,30 +39,30 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Await loginUser function
+      // Call loginUser function
       const result = await loginUser(email, password);
-      console.log("Login result:", result);
 
       if (result.success) {
         toast({
-          title: "Login Successful",
-          description: "You have been logged in successfully.",
-          variant: "default"
+          title: 'Login Successful',
+          description: 'You have been logged in successfully.',
+          variant: 'default',
         });
-        console.log("Navigating to Dashboard");
-        navigate('/Dashboard');
+
+        // Navigate to the dashboard
+        navigate('/dashboard');
       } else {
         toast({
-          title: "Login Failed",
-          description: result.error || "Invalid email or password.",
-          variant: "destructive"
+          title: 'Login Failed',
+          description: result.error || 'Invalid email or password.',
+          variant: 'destructive',
         });
       }
     } catch (error: any) {
       toast({
-        title: "Login Failed",
-        description: error.message || "An error occurred during login.",
-        variant: "destructive"
+        title: 'Login Failed',
+        description: error.message || 'An error occurred during login.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -80,9 +80,7 @@ const Login = () => {
           </div>
           <span className="font-bold text-2xl">Unity Grande</span>
         </Link>
-        <h2 className="text-center text-3xl font-extrabold">
-          Sign in to your account
-        </h2>
+        <h2 className="text-center text-3xl font-extrabold">Sign in to your account</h2>
         <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Don't have an account?{' '}
           <Link
@@ -166,35 +164,6 @@ const Login = () => {
               </Button>
             </div>
           </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                disabled={isLoading}
-              >
-                Google
-              </button>
-              <button
-                type="button"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                disabled={isLoading}
-              >
-                Apple
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
