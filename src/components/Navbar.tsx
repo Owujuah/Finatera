@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, Moon, Sun, User, LogOut } from 'lucide-react';
@@ -10,6 +9,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(localStorage.getItem('theme') === 'dark');
   const [userName, setUserName] = useState('');
+  const [isAuth, setIsAuth] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -23,33 +23,42 @@ const Navbar = () => {
     document.documentElement.classList.toggle('dark');
   };
   
-  const handleLogout = () => {
-    logoutUser();
+  const handleLogout = async () => {
+    await logoutUser();
     setIsMenuOpen(false);
     navigate('/');
   };
-  
+
   useEffect(() => {
-    if (localStorage.getItem('theme') === 'dark' || 
-        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-      setDarkMode(true);
-    } else {
-      document.documentElement.classList.remove('dark');
-      setDarkMode(false);
-    }
-    
-    const userId = getCurrentUserId();
-    if (userId) {
-      const user = getUserById(userId);
-      if (user) {
-        setUserName(user.name);
+    // Wrap asynchronous calls in an inner async function
+    const loadData = async () => {
+      // Set theme based on localStorage and system preferences
+      if (
+        localStorage.getItem('theme') === 'dark' ||
+        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
+      ) {
+        document.documentElement.classList.add('dark');
+        setDarkMode(true);
+      } else {
+        document.documentElement.classList.remove('dark');
+        setDarkMode(false);
       }
-    }
-  }, [location.pathname]);
+      
+      // Get the current user's ID from Supabase
+      const userId = await getCurrentUserId();
+      setIsAuth(!!userId);
+      if (userId) {
+        // Fetch user data from Supabase using the user ID
+        const user = await getUserById(userId);
+        if (user) {
+          setUserName(user.name);
+        }
+      }
+    };
+    loadData();
+  }, [location.pathname, navigate]);
   
-  const isAuth = Boolean(getCurrentUserId());
-  
+  // Conditional rendering based on authentication status
   if (!isAuth && location.pathname !== '/') {
     return null;
   }
@@ -57,13 +66,15 @@ const Navbar = () => {
   if (location.pathname === '/login' || location.pathname === '/signup') {
     return null;
   }
-
+  
   return (
     <header className="fixed top-0 left-0 right-0 z-50 neo-glass">
       <div className="container flex items-center justify-between py-4">
         <Link to="/" className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center">
-            <span className="text-white font-bold"><img src="/Images/image 2.png" alt="owujuah" /></span>
+            <span className="text-white font-bold">
+              <img src="/Images/image 2.png" alt="owujuah" />
+            </span>
           </div>
           <span className="font-bold text-xl">Unity Grande</span>
         </Link>
@@ -150,15 +161,15 @@ const Navbar = () => {
           <nav className="flex flex-col space-y-4">
             {isAuth ? (
               <>
-                <Link 
-                  to="/dashboard" 
+                <Link
+                  to="/dashboard"
                   className="text-sm font-medium hover:text-teal-500 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Dashboard
                 </Link>
-                <Link 
-                  to="/profile" 
+                <Link
+                  to="/profile"
                   className="text-sm font-medium hover:text-teal-500 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -174,37 +185,39 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <a 
-                  href="#features" 
+                <a
+                  href="#features"
                   className="text-sm font-medium hover:text-teal-500 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Features
                 </a>
-                <a 
-                  href="#security" 
+                <a
+                  href="#security"
                   className="text-sm font-medium hover:text-teal-500 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Security
                 </a>
-                <a 
-                  href="#about" 
+                <a
+                  href="#about"
                   className="text-sm font-medium hover:text-teal-500 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   About
                 </a>
                 <div className="pt-2 flex flex-col space-y-2">
-                  <Link 
-                    to="/login" 
+                  <Link
+                    to="/login"
                     className="w-full"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Button variant="outline" className="w-full">Login</Button>
+                    <Button variant="outline" className="w-full">
+                      Login
+                    </Button>
                   </Link>
-                  <Link 
-                    to="/signup" 
+                  <Link
+                    to="/signup"
                     className="w-full"
                     onClick={() => setIsMenuOpen(false)}
                   >

@@ -12,7 +12,7 @@ const Cards = () => {
   // Check if user is authenticated
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/login');
+      navigate('/dashboard');
     }
   }, [navigate]);
   

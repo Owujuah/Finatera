@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
@@ -17,17 +16,17 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+
   // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+
+  // Handle form submission using async/await properly
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate form
+
+    // Validate fields
     if (!email || !password) {
       toast({
         title: "Validation Error",
@@ -36,44 +35,54 @@ const Login = () => {
       });
       return;
     }
-    
+
     setIsLoading(true);
-    
-    // Simulate server processing
-    setTimeout(async () => {
-      const result = loginUser(email, password);
-      
-      if ((await result).success) {
+
+    try {
+      // Await loginUser function
+      const result = await loginUser(email, password);
+      console.log("Login result:", result);
+
+      if (result.success) {
         toast({
           title: "Login Successful",
           description: "You have been logged in successfully.",
           variant: "default"
         });
-        
-        // Redirect to dashboard
-        navigate('/dashboard');
+        console.log("Navigating to Dashboard");
+        navigate('/Dashboard');
       } else {
         toast({
           title: "Login Failed",
-          description: (await result).error || "Invalid email or password.",
+          description: result.error || "Invalid email or password.",
           variant: "destructive"
         });
       }
-      
+    } catch (error: any) {
+      toast({
+        title: "Login Failed",
+        description: error.message || "An error occurred during login.",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
           <div className="w-10 h-10 rounded-full bg-banking-primary flex items-center justify-center">
-            <span className="text-white font-bold"><img src="/Images/image 2.png" alt="owujuah"/></span>
+            <span className="text-white font-bold">
+              <img src="/Images/image 2.png" alt="owujuah" />
+            </span>
           </div>
           <span className="font-bold text-2xl">Unity Grande</span>
         </Link>
-        <h2 className="text-center text-3xl font-extrabold">Sign in to your account</h2>
+        <h2 className="text-center text-3xl font-extrabold">
+          Sign in to your account
+        </h2>
         <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Don't have an account?{' '}
           <Link
@@ -137,14 +146,10 @@ const Login = () => {
                   onCheckedChange={(checked) => setRememberMe(!!checked)}
                   disabled={isLoading}
                 />
-                <Label
-                  htmlFor="remember-me"
-                  className="ml-2 text-sm"
-                >
+                <Label htmlFor="remember-me" className="ml-2 text-sm">
                   Remember me
                 </Label>
               </div>
-
               <div className="text-sm">
                 <Link
                   to="#"
@@ -156,11 +161,7 @@ const Login = () => {
             </div>
 
             <div>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Signing in...' : 'Sign in'}
               </Button>
             </div>
@@ -177,7 +178,6 @@ const Login = () => {
                 </span>
               </div>
             </div>
-
             <div className="mt-6 grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -197,7 +197,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <Link
           to="/"

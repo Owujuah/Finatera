@@ -15,6 +15,7 @@ import Transactions from "./pages/Transactions";
 import NotFound from "./pages/NotFound";
 import { initAuth } from "./utils/authUtils";
 
+
 const queryClient = new QueryClient();
 
 const App = () => {

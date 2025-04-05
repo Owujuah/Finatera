@@ -19,26 +19,31 @@ const Profile = () => {
     createdAt: '',
   });
   
-  // Check if user is authenticated
   useEffect(() => {
-    if (!isAuthenticated()) {
-      navigate('/login');
-      return;
-    }
-    
-    // Get user data
-    const userId = getCurrentUserId();
-    if (userId) {
-      const user = getUserById(userId);
-      if (user) {
-        setUserData({
-          name: user.name,
-          email: user.email,
-          balance: user.balance,
-          createdAt: user.createdAt,
-        });
+    const loadUserData = async () => {
+      // Check if the user is authenticated
+      const auth = await isAuthenticated();
+      if (!auth) {
+        navigate('/Profile');
+        return;
       }
-    }
+      
+      // Retrieve the current user's ID
+      const userId = await getCurrentUserId();
+      if (userId) {
+        // Fetch the user data from Supabase
+        const user = await getUserById(userId);
+        if (user) {
+          setUserData({
+            name: user.name,
+            email: user.email,
+            balance: user.balance,
+            createdAt: user.createdAt,
+          });
+        }
+      }
+    };
+    loadUserData();
   }, [navigate]);
   
   // Format date with error handling
